@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block head %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
+
+{% block title %}Concession Form{% endblock %}
+
+{% block mycss %}
+    
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+        .content {
+            max-width: 800px;
+            padding: 20px;
+            margin-left: 80px; /* ✅ this shifts the whole form */
+        }
+        
+        .form-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .preview-content {
+            position: relative;
+            width: 100%;
+            text-align: center;
+        }
+        .preview-content img {
+            width: 100%;
+            height: auto;
+        }
+        .preview-text {
+            position: absolute;
+            font-weight: bold;
+            font-size: 14px;
+            color: black;
+        }
+        .student-name { top: 120px; left: 250px; }
+        .college-name { top: 160px; left: 250px; }
+        .from-station { top: 200px; left: 250px; }
+        .to-station { top: 240px; left: 250px; }
+        .class { top: 280px; left: 250px; }
+        .validity { top: 320px; left: 250px; }
+        .alert-warning {
+            font-weight: bold;
+            font-size: 16px;
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        .preview-content {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .preview-content img {
+            width: 100%;
+            height: auto;
+        }
+        
+        .preview-text {
+            position: absolute;
+            font-size: 14px;
+            font-weight: bold;
+            color: #000;
+        }
+        
+        /* Slightly right & properly aligned vertically */
+        .preview-text.student-name {
+            top: 112px;
+            left: 170px; /* moved right */
+        }
+        
+        .preview-text.college-name {
+            top: 111px;
+            left: 420px; /* moved right */
+        }
+        
+        /* Moved further down to sit inside table cells */
+        .preview-text.class {
+            top: 264px;
+            left: 90px;
+        }
+        
+        .preview-text.from-station {
+            top: 264px;
+            left: 235px;
+        }
+        
+        .preview-text.to-station {
+            top: 264px;
+            left: 400px;
+        }
+        
+        .preview-text.validity {
+            top: 264px;
+            left: 590px;
+        }
+    
+{% endblock %}
+
+{% block body %}
+    <div class="content">
+        <div class="form-container">
+            <h2>Railway Concession Form</h2>
+            {% if user_has_concession %}
+            <div class="alert alert-warning" role="alert">
+                You have already applied for a railway concession. You cannot apply again until your current concession expires.
+            </div>
+            {% else %}
+            <form id="concessionForm" action="{% url 'savedetail' %}" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="studentName">Student Name:</label>
+                    <input type="text" class="form-control" id="studentName" name="studentname" required>
+                </div>
+                <div class="form-group">
+                    <label for="collegeName">College Name:</label>
+                    <input type="text" class="form-control" id="collegeName" name="collegename" required>
+                </div>
+                <div class="form-group">
+                    <label for="fromStation">From Station:</label>
+                    <input type="text" class="form-control" id="fromStation" name="station1" required>
+                </div>
+                <div class="form-group">
+                    <label for="toStation">To Station:</label>
+                    <input type="text" class="form-control" id="toStation" name="station2" required>
+                </div>
+                <div class="form-group">
+                    <label for="class">Class:</label>
+                    <select class="form-control" id="class" name="classes" required>
+                        <option value="II">II</option>
+                        <option value="I">I</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="validity">Validity Period:</label>
+                    <select class="form-control" id="validity" name="month" onchange= "calculateDates()"required>
+                        <option value="1">1 Months</option>
+                        <option value="3">3 Months</option>
+                    </select>
+                </div>
+                <input type="hidden" id="current_date" name="current_date">
+                <input type="hidden" id="valid_till_date" name="valid_till_date">
+                <hr>
+                <button type="button" class="btn btn-secondary" onclick="previewForm()">Preview Form</button>
+                <button type="submit"id="submitbtn" class="btn btn-primary" onclick="clickon(event)">Submit Form</button>
+                
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Form Preview -->
+    <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="previewModalLabel">Form Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="preview-content position-relative">
+                        <img src="{% static 'image/railway.png' %}" alt="Form Template">
+                        <span id="prevStudentName" class="preview-text student-name"></span>
+                        <span id="prevCollegeName" class="preview-text college-name"></span>
+                        <span id="prevFromStation" class="preview-text from-station"></span>
+                        <span id="prevToStation" class="preview-text to-station"></span>
+                        <span id="prevClass" class="preview-text class"></span>
+                        <span id="prevValidity" class="preview-text validity"></span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        
+    window.onload = function () {
+        console.log("javascriplt loaded")
+            var submitBtn = document.getElementById("submitbtn");
+            console.log("User has concession:", "{{ user_has_concession }}");
+            // Convert Django Boolean to JS Boolean
+            var userHasConcession = "{{ user_has_concession|lower }}" === "true";
+        
+            if (userHasConcession) {
+                submitBtn.disabled = true; // Disable submit button
+            }
+        }; 
+
+
+        function previewForm() {
+            if ("{{ user_has_concession }}" === "True") {
+                alert("You have already applied for a railway concession. You cannot apply again until your current concession expires.");
+             
+            } else {
+                document.getElementById("prevStudentName").innerText = document.getElementById("studentName").value;
+                document.getElementById("prevCollegeName").innerText = document.getElementById("collegeName").value;
+                document.getElementById("prevFromStation").innerText = document.getElementById("fromStation").value;
+                document.getElementById("prevToStation").innerText = document.getElementById("toStation").value;
+                document.getElementById("prevClass").innerText = document.getElementById("class").value;
+                document.getElementById("prevValidity").innerText = document.getElementById("validity").value;
+        
+                var previewModal = new bootstrap.Modal(document.getElementById("previewModal"));
+                previewModal.show();
+            
+            }
+        }
+        function calculateDates() {
+            let validityPeriod = document.getElementById("validity").value;
+        
+            // Get current date adjusted for local time zone
+            let currentDate = new Date();
+            let localDate = new Date(currentDate.getTime() - currentDate.getTimezoneOffset() * 60000);
+            let formattedCurrentDate = localDate.toISOString().split('T')[0];
+        
+            // Calculate valid till date adjusted for local time zone
+            let validTillDate = new Date(localDate);
+            validTillDate.setMonth(validTillDate.getMonth() + parseInt(validityPeriod));
+            let formattedValidTillDate = validTillDate.toISOString().split('T')[0];
+        
+            // Set values in hidden fields
+            document.getElementById("current_date").value = formattedCurrentDate;
+            document.getElementById("valid_till_date").value = formattedValidTillDate;
+        }
+        
+        // Run the function once when page loads to set default values
+
+        
+        // Run the function once when page loads to set default values
+        calculateDates();
+    </script>
+{% endblock %}

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - DBIT Railway Concession</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #E0E7FF;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center; /* Center content horizontally */
+            align-items: center;     /* Center content vertically */
+            height: 100vh;           /* Full viewport height */
+        }
+        .content {
+            width: 100%;
+            max-width: 800px;       /* Maximum width for the content */
+            padding: 20px;
+            text-align: center;
+        }
+        .notification-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .toggle-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h1>Notification Settings</h1>
+        <div class="notification-box">
+            <h3>Email & SMS Alerts</h3>
+            <p>Enable alerts to receive notifications when your concession period is about to end.</p>
+            <div class="toggle-container">
+                <div class="toggle">
+                    <label>Email Alerts:</label>
+                    <input type="checkbox" id="emailToggle" checked>
+                </div>
+                <div class="toggle">
+                    <label>SMS Alerts:</label>
+                    <input type="checkbox" id="smsToggle" checked>
+                </div>
+            </div>
+        </div>
+        <button onclick="sendTestNotification()">Send Test Notification</button>
+    </div>
+    <script>
+        function sendTestNotification() {
+            const emailEnabled = document.getElementById('emailToggle').checked;
+            const smsEnabled = document.getElementById('smsToggle').checked;
+            
+            if (emailEnabled) {
+                alert('Test Email Notification Sent!');
+            }
+            if (smsEnabled) {
+                alert('Test SMS Notification Sent!');
+            }
+            if (!emailEnabled && !smsEnabled) {
+                alert('No notifications enabled. Please enable at least one option.');
+            }
+        }
+    </script>
+</body>
+</html>

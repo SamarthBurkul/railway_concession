@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logout</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" crossorigin="anonymous">
+  <style>
+    body {
+      background: linear-gradient(to right, #0f0c29, #302b63, #24243e);
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: rgba(20, 20, 20, 0.9);
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0px 4px 15px rgba(255, 255, 255, 0.1);
+      text-align: center;
+      max-width: 400px;
+      opacity: 1;
+      transition: opacity 1s ease-in-out;
+    }
+    .fade-out {
+      opacity: 0;
+    }
+    .btn-custom {
+      background: #ff4c4c;
+      color: #fff;
+      border-radius: 8px;
+      padding: 12px;
+      width: 100%;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+    .btn-custom:hover {
+      background: #cc0000;
+    }
+    .btn-secondary {
+      background: #555;
+      color: #fff;
+      margin-top: 10px;
+      border-radius: 8px;
+      padding: 10px;
+      width: 100%;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="logout-box">
+    <h2>Are you sure you want to log out?</h2>
+    <p>You will be redirected to the login page after logout.</p>
+    <button class="btn btn-custom" onclick="logout()">Logout</button>
+    <a href="dashboard.html" class="btn btn-secondary">Cancel</a>
+  </div>
+
+  <script>
+ function logout()
+ {
+  window.location.href = "{% url 'login' %}"; 
+ }
+  </script>
+</body>
+</html>

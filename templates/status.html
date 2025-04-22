@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% block title %}Concession Form - DBIT Portal{% endblock %}
+{%block head%}    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+{%endblock%}
+{% block mycss %}  
+body {
+    background-color: #f8f9fa;
+    color: #333;
+    font-family: 'Poppins', sans-serif;
+}
+
+.navbar {
+    background-color: #007bff;
+}
+
+.navbar-brand {
+    color: #fff !important;
+    font-weight: bold;
+}
+
+.status-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-left: 5px solid #007bff;
+    transition: transform 0.3s ease-in-out;
+}
+
+.status-card:hover {
+    transform: scale(1.02);
+}
+
+.progress {
+    height: 12px;
+    border-radius: 20px;
+    transition: width 1s ease-in-out;
+}
+
+.progress-bar {
+    border-radius: 20px;
+}
+
+.search-bar {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto 20px auto;
+    position: relative;
+}
+
+.search-bar input {
+    padding-right: 35px;
+}
+
+.clear-search {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #666;
+}
+
+.legend-box {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    margin-right: 8px;
+    {% endblock %}
+
+{% block body   %}
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">DBIT Railway Concession</a>
+        </div>
+    </nav>
+    
+    <div class="container mt-4">
+        <header class="text-center mb-4">
+            <h2>📋 Application Status</h2>
+        </header>
+    
+        <div class="search-bar">
+            <input type="text" id="searchInput" class="form-control" placeholder="Search by date or status...">
+            <span class="clear-search" onclick="clearSearch()">✖</span>
+        </div>
+    
+        <div class="legend-box">
+            <div class="legend-item"><div class="legend-color bg-secondary"></div> Application Submitted</div>
+            <div class="legend-item"><div class="legend-color bg-warning"></div> Application Under Process</div>
+            <div class="legend-item"><div class="legend-color bg-success"></div> Application Accepted</div>
+        </div>
+    
+        <div id="statusContainer"></div>
+    
+        <div class="text-center mt-3">
+            <a href="/home/" class="btn btn-primary">🏠 Back to Dashboard</a>
+        </div>
+    </div>
+    
+    <script>
+        // Status data from Django context
+        const studentRequests = {{ status_data|safe }};
+    
+        
+function getStatusHTML(req) {
+    function getProgressBar(progressClass, progressWidth) {
+        return `
+            <div class="progress mt-2">
+                <div class="progress-bar ${progressClass}" role="progressbar"
+                     style="width: ${progressWidth}%"
+                     aria-valuenow="${progressWidth}" aria-valuemin="0" aria-valuemax="100">
+                </div>
+            </div>
+        `;
+    }
+
+    return `
+        <div class="status-card mb-3 border border-secondary w-100">
+            <p class="fw-bold"><i class="fas fa-file-alt text-secondary"></i> Submitted on:</p>
+            <p>${req.submitted_date}</p>
+            ${getProgressBar("bg-secondary", 30)}
+        </div>
+
+        <div class="status-card mb-3 border border-warning w-100">Under Process:</p>
+            <p>${req.under_process_date || 'N/A'}</p>
+            ${getProgressBar("bg-warning", 60)}
+        </div>
+
+        <div class="status-card mb-3 border border-success w-100">
+            <p class="fw-bold"><i class="fas fa-check-circle text-success"></i> Accepted on:</p>
+            <p>${req.accepted_date || 'N/A'}</p>
+            ${getProgressBar("bg-success", 100)}
+        </div>
+    `;
+}
+ function loadApplicationStatus(filter = "") {
+            const statusContainer = document.getElementById("statusContainer");
+            const filteredRequests = studentRequests.filter(req => 
+                req.submitted_date.toLowerCase().includes(filter.toLowerCase()) ||
+                (req.under_process_date && req.under_process_date.toLowerCase().includes(filter.toLowerCase())) ||
+                (req.accepted_date && req.accepted_date.toLowerCase().includes(filter.toLowerCase()))
+            );
+    
+            statusContainer.innerHTML = filteredRequests.length === 0
+                ? `<p class="text-center">No application requests found.</p>`
+                : filteredRequests.map(getStatusHTML).join("");
+        }
+    
+        function clearSearch() {
+            document.getElementById("searchInput").value = "";
+            loadApplicationStatus();
+        }
+    
+        document.addEventListener("DOMContentLoaded", () => loadApplicationStatus());
+    
+        document.getElementById("searchInput").addEventListener("input", (e) => {
+            loadApplicationStatus(e.target.value);
+        });
+    </script>
+    {% endblock %}

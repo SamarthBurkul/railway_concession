@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBIT Student Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            display: flex;
+            height: 100vh;
+        }
+        .left-section {
+            flex: 1.5;
+            position: relative;
+            overflow: hidden;
+        }
+        .video-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* Darker overlay for better contrast */
+        }
+        .welcome-text {
+            position: absolute;
+            top: 30%;
+            left: 10%;
+            color: white;
+            font-size: 50px; /* Increased size */
+            font-weight: bold;
+            opacity: 0;
+            animation: slideIn 1s ease-in-out forwards;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(-50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .right-section {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff; /* Adjusted background color */
+            box-shadow: -5px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .login-container {
+            width: 350px;
+            padding: 20px;
+        }
+        .btn-google {
+            background-color: #db4437;
+            color: white;
+            width: 100%;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-google img {
+            width: 20px;
+            margin-right: 10px;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+        }
+        .popup.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="left-section">
+        <iframe class="video-background" src="https://www.youtube.com/embed/U1FxwIgU6JY?autoplay=1&loop=1&mute=1&playlist=U1FxwIgU6JY" frameborder="0" allowfullscreen></iframe>
+        <div class="overlay"></div>
+        <div class="welcome-text">Welcome to DBIT Student Login Portal</div>
+    </div>
+    <div class="right-section">
+        <div class="login-container">
+            <h2 class="text-center">Login</h2>
+            <form action="{% url 'home' %}" method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email address</label>
+                    <input type="email" class="form-control" id="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Login</button>
+                <button type="button" class="btn btn-google" onclick="loginWithGoogle()">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png" alt="Google Logo">Login with Google
+                </button>
+            </form>
+            <p class="text-center mt-3">
+                Don't have an account? <a href="#" onclick="openSignup()">Sign Up</a>
+            </p>
+        </div>
+    </div>
+
+    <div class="popup" id="signupPopup">
+        <h3>Sign Up</h3>
+        <form>
+            <div class="mb-3">
+                <label for="newEmail" class="form-label">Email</label>
+                <input type="email" class="form-control" id="newEmail" required>
+            </div>
+            <div class="mb-3">
+                <label for="newPassword" class="form-label">Password</label>
+                <input type="password" class="form-control" id="newPassword" required>
+            </div>
+            <button type="submit" class="btn btn-success w-100">Sign Up</button>
+            <button type="button" class="btn btn-secondary w-100 mt-2" onclick="closeSignup()">Close</button>
+        </form>
+    </div>
+
+    <script>
+        function loginWithGoogle() {
+            alert("Google login functionality to be implemented");
+        }
+        function openSignup() {
+            document.getElementById("signupPopup").classList.add("show");
+        }
+        function closeSignup() {
+            document.getElementById("signupPopup").classList.remove("show");
+        }
+    </script>
+</body>
+</html>

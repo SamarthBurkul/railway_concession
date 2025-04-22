@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {%block head%}{%endblock%}
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.sidebar {
+    width: 250px;
+    background: rgba(58, 58, 58, 0.8);
+    color: white;
+    height: 100vh;
+    padding: 20px;
+    box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow: auto;
+}
+
+.sidebar h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    padding: 15px;
+    margin: 10px 0;
+    background: #555;
+    cursor: pointer;
+    border-radius: 5px;
+    text-align: center;
+    transition: background 0.3s;
+}
+
+.sidebar ul li:hover {
+    background: #777;
+}
+
+.sidebar ul li a {
+    color: white;
+    text-decoration: none;
+    display: block;
+}
+
+.content {
+    margin-left: 250px;
+    padding: 20px;
+    flex-grow: 1;
+}
+
+.loader {
+    border: 5px solid #f3f3f3; /* Light grey */
+    border-top: 5px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 2s linear infinite;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+{%block mycss%} 
+{%endblock%}
+
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}
+    </title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar">
+        <h2>DBIT Portal</h2>
+        <ul>
+            <li><a href="{% url 'home' %}">Dashboard</a></li>
+            <li><a href="{% url 'concession' %}">Concession Status</a></li>
+            <li><a href="{% url 'myadmin' %}">Myadmin</a></li>
+            <li><a href="{% url 'status' %}">Status</a></li>
+            <li><a href="{% url 'mysettings' %}">Settings</a></li>
+            <li><a href="{%url 'logout' %}">Logout</a></li>
+        </ul>
+    </div>
+    <div class="content">
+        {% block body %}{% endblock %}  </div>
+        <div id="loader" class="loader"></div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var links = document.querySelectorAll('a');
+                var content = document.querySelector('.content'); // Get the content area
+        
+                links.forEach(function(link) {
+                    link.addEventListener('click', function(event) {
+                        event.preventDefault(); // Prevent immediate navigation
+                        document.getElementById('loader').style.display = 'block'; // Show loader
+                        content.style.display = 'none'; // Hide content area
+        
+                        // Simulate a 5-second delay before navigating
+                        setTimeout(function() {
+                            window.location.href = link.href; // Navigate to the link after 5 seconds
+                        }, 1000); // 5000 milliseconds = 5 seconds
+                    });
+                });
+        
+                // Hide loader when the page is fully loaded
+                window.addEventListener('load', function() {
+                    document.getElementById('loader').style.display = 'none';
+                    content.style.display = 'block'; // Show content area
+                });
+            });
+        </script>
+</body>
+</html>

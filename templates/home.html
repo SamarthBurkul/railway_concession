@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+{%block head%}
+{%endblock%}
+{% block title %}Concession Form - DBIT Portal{% endblock %}
+
+ {% block mycss %}  
+ body {
+    font-family: Arial, sans-serif;
+    background-color: #E0E7FF;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center; /* Center the content horizontally */
+    align-items: center; /* Center the content vertically */
+    height: 100vh; /* Full viewport height */
+}
+
+.content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 80%; /* Adjust width as needed */
+    max-width: 800px; /* Maximum width */
+}
+.background-text {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 120px;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.15);
+    z-index: -1;
+    animation: fadeInOut 4s infinite alternate;
+}
+@keyframes fadeInOut {
+    from { opacity: 0.3; transform: scale(1); }
+    to { opacity: 0.7; transform: scale(1.1); }
+}
+.status-container {
+    display: flex;
+    justify-content: space-around;
+    gap:20px;
+    margin-bottom: 20px;
+}
+.status-box {
+    flex: 1;
+    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    text-align: center;
+    color: #111;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.status-box h3 {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+.graph-container {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    height: 300px;
+}
+.auto-renew {
+    background: blue;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+}
+.auto-renew:hover {
+    background: darkblue;
+}
+.popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    text-align: center;
+}
+.popup button {
+    margin: 10px;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+.popup .confirm {
+    background: green;
+    color: white;
+}
+.popup .cancel {
+    background: red;
+    color: white;
+}
+.concession-date-box {
+    position: absolute;
+    top: 45%;
+    right: 5%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(6px);
+    border-radius: 12px;
+    padding: 14px 16px;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+    font-size: 18px;
+    font-family: 'Segoe UI', sans-serif;
+    color: #333;
+    font-weight: 500;
+    z-index: 10;
+    border: 1px solid rgba(200, 200, 200, 0.3);
+    max-width: 180px;              /* 🧠 Limit width */
+    white-space: normal;           /* 🧠 Allow wrap */
+    word-wrap: break-word;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-align: left;
+}
+
+
+/* Animation */
+@keyframes fadeSlide {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px) translateX(30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) translateX(0);
+    }
+}
+
+.animate-fade-slide {
+    animation: fadeSlide 1s ease-in-out forwards;
+}
+.concession-date-box:hover {
+    box-shadow: 0 10px 25px rgba(30, 64, 175, 0.35);
+    transform: translate(-50%, -50%) scale(1.02);
+    transition: all 0.3s ease-in-out;
+  }
+  h1 {
+    margin-top: 150px; /* or padding-top: 40px */
+    text-align: center;
+    animation: fadeSlideIn 1s ease-out forwards;
+}
+
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+  
+ {% endblock %}
+
+
+
+{% block body %} 
+<div class="content-fluid">
+    <div class="background-text">DBIT</div>
+    <h1>Welcome to DBIT Railway Concession Portal</h1>
+    <div class="status-container">
+        <div class="status-box">
+            <h3>Application Status</h3>
+            <p>{{ status|default:"No Progress" }}</p>
+        </div>
+        <div class="status-box">
+            <h3>Last Updated</h3>
+            <p>
+                {% if last_updated %}
+                    {{ last_updated|date:"F d, Y" }}
+                {% else %}
+                    No Update
+                {% endif %}
+            </p>
+        </div>
+        
+    </div>
+    <div class="graph-container">
+        <canvas id="concessionChart"></canvas>
+        <div  class="concession-date-box animate-fade-slide"  style="
+            position: absolute;
+            top: 48%;
+            left: 69%; /* Position to the right */
+            transform: translate(-50%, -50%);
+            text-align: left;
+            font-size: 20px;
+            font-weight: 600;
+             background: #f4f6f8;         /* light neutral gray */
+            border: 2px solid #cbd5e1;   /* subtle soft gray-blue border */
+            color: #111827;   
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    ">
+    <div style="color: #1e40af; font-weight: 600; font-size: 18px; letter-spacing: 0.3px;"><strong>Start :</strong> {{ start_date|date:"d M Y" }}</div>
+     <div style="color: #1e40af; font-weight: 600; font-size: 18px; letter-spacing: 0.3px;"><strong>End :</strong> {{ end_date|date:"d M Y" }}</div>
+    </div>
+    </div>
+    <button class="auto-renew" onclick="openPopup()">Auto-Renew Concession</button>
+    <div class="popup" id="popup">
+        <p>Are you sure you want to auto-renew your concession?</p>
+        <button class="confirm" onclick="confirmRenew()">Yes</button>
+        <button class="cancel" onclick="closePopup()">No</button>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    function updategraph()
+    {
+        var status = "{{ status|default:'pending' }}".trim();  // Ensure status exists
+        var usedPercentage = parseFloat("{{ used_percentage|default:0 }}") || 0;
+        var remainingPercentage = parseFloat("{{ remaining_percentage|default:100 }}") || 100;
+        console.log("Status:", status);
+        console.log("Used Percentage:", usedPercentage);
+        console.log("Remaining Percentage:", remainingPercentage);
+        var colors, labels, data;
+        
+        if (status === "pending") {
+            colors = ["#FBBF24", "#E0E0E0"];  // Yellow & Gray for Pending
+            labels = ["Pending approval", "Remaining"];
+            data = [100, 0];  // Static data for pending
+        } 
+        else if (status === "accepted") {
+            colors = ["#6366F1", "#FBBF24"];
+            // Blue & Gray for Accepted
+            labels = ["Used", "Remaining"];
+            data = [usedPercentage, remainingPercentage];  // Use dynamically calculated values
+        } 
+        else if (status === "rejected") {
+            colors = ["#FF3B30", "#E0E0E0"];  // Red for Rejected, Gray for empty
+            labels = ["Rejected", "Empty"];
+            data = [100, 0];  // Full red for rejection
+        }
+        else
+        {
+            labels = ["Not Started", "Empty"];
+            colors = ["#3949AB", "#90A4AE"]; 
+        data = [0, 100];
+
+        }
+        // Now use the 'data', 'labels', and 'colors' variables in your chart rendering logic
+        
+        var ctx = document.getElementById('concessionChart').getContext('2d');
+        var concessionChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: colors,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+    
+    function openPopup() {
+        document.getElementById('popup').style.display = 'block';
+    }
+
+    function closePopup() {
+        document.getElementById('popup').style.display = 'none';
+    }
+
+    function confirmRenew() {
+        alert("Concession Auto-Renewed Successfully!");
+        closePopup();
+    }
+    //function for loading data in graph
+    window.onload = updategraph();
+</script>
+
+{% endblock %}
